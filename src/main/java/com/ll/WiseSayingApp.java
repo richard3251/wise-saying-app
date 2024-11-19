@@ -1,11 +1,10 @@
-package com.ll.task;
+package com.ll;
 
 import java.util.Scanner;
 
-public class wise_saying {
+public class WiseSayingApp {
 
-    public static void main(String[] args) {
-
+    public void run() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("==명언 앱==");
@@ -13,12 +12,21 @@ public class wise_saying {
         while (true) {
             System.out.print("명령) ");
             String input = scanner.nextLine();
+
             if (input.equals("종료")) {
                 break;
+            } else if (input.equals("등록")) {
+                System.out.print("명언 : ");
+                String wiseSaying = scanner.nextLine();
+                System.out.print("작가 : ");
+                String author = scanner.nextLine();
             }
         }
 
     }
+
+
+
 
 
 }
