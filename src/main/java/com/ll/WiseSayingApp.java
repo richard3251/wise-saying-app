@@ -55,9 +55,20 @@ public class WiseSayingApp {
             } else if (input.startsWith("삭제?id=")) {
 
                 int deleteNum = Integer.parseInt(input.split("=") [1] );
-                obj.set(deleteNum -1, null);
 
-                System.out.println(deleteNum + "번 명언이 삭제되었습니다.");
+                try {
+                    if (deleteNum > obj.size() || deleteNum <= 0) {
+                        throw new IllegalArgumentException(deleteNum + "번 명언은 존재하지 않습니다.");
+                    } else if (obj.get(deleteNum-1) == null){
+                        throw new IllegalArgumentException(deleteNum + "번 명언은 존재하지 않습니다.");
+                    } else {
+                        obj.set(deleteNum -1, null);
+                        System.out.println(deleteNum + "번 명언이 삭제되었습니다.");
+                    }
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+
             }
 
         }
