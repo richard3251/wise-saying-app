@@ -3,11 +3,12 @@ package com.ll;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
 class Information {
 
-    int id;
-    String content;
-    String author;
+    private int id;
+    private String content;
+    private String author;
 
     Information(int id, String content, String author) {
         this.id = id;
@@ -15,6 +16,29 @@ class Information {
         this.author = author;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 }
 
 public class WiseSayingApp {
@@ -48,7 +72,7 @@ public class WiseSayingApp {
                 System.out.println("------------------------");
                 for (int i = obj.size() - 1; i >= 0; i--) {
                     if (obj.get(i) != null) {
-                        System.out.println(obj.get(i).id + " / " + obj.get(i).content + " / " + obj.get(i).author);
+                        System.out.println(obj.get(i).getId() + " / " + obj.get(i).getContent() + " / " + obj.get(i).getAuthor());
                     }
 
                 }
@@ -68,6 +92,30 @@ public class WiseSayingApp {
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
+
+            } else if (input.startsWith("수정?id=")) {
+                int updateNum = Integer.parseInt(input.split("=") [1]);
+
+                try {
+                    if (updateNum < 1 || updateNum > obj.size()) {
+                        throw new IllegalArgumentException(updateNum + "번 명언은 존재하지 않습니다.");
+                    } else if (obj.get(updateNum-1) == null) {
+                        throw new IllegalArgumentException(updateNum + "번 명언은 존재하지 않습니다.");
+                    } else {
+                        System.out.println("명언(기존) : " + obj.get(updateNum-1).getContent());
+                        System.out.print("명언 : ");
+                        obj.get(updateNum-1).setContent(scanner.nextLine());
+
+                        System.out.println("작가(기존) : " + obj.get(updateNum-1).getAuthor());
+                        System.out.print("작가 : ");
+                        obj.get(updateNum-1).setAuthor(scanner.nextLine());
+                    }
+
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+
+
 
             }
 
