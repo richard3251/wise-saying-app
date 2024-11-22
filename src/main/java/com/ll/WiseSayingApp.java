@@ -1,12 +1,12 @@
 package com.ll;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,13 +22,16 @@ class Information {
     private String content;
     private String author;
 
+    public Information() {
+    }
+
     Information(int id, String content, String author) {
         this.id = id;
         this.content = content;
         this.author = author;
     }
 
-    // JSON 파일로 저장
+    // 객체에서 JSON 파일로 저장
     public void saveToFile() throws IOException {
 
         Path directoryPath = Paths.get("db/wiseSaying");
@@ -36,23 +39,31 @@ class Information {
             Files.createDirectories(directoryPath);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String jsonContent = gson.toJson(this);
+//        Gson gson = new GsonBuilder().setPrettyPrinting().create(); // Gson
+        ObjectMapper objectMapper = new ObjectMapper(); // Jackson
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // .json파일 이쁘게 저장.
+
+//        String jsonContent = gson.toJson(this); // Gson
+        String jsonContent = objectMapper.writeValueAsString(this); // Jackson
 
         Files.writeString(Paths.get("db/wiseSaying/" + id + ".json"), jsonContent);
+
     }
 
-    // JSON 파일에서 객체를 읽기
+    // JSON 파일에서 객체로 변환해서 가져오기
     public static Information loadFromFile(int id) throws IOException {
-        Gson gson = new Gson();
-        Reader reader = Files.newBufferedReader(Paths.get("db/wiseSaying/" + id + ".json"));
 
-        return gson.fromJson(reader, Information.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Path path = Paths.get("db/wiseSaying/" + id + ".json");
+        return objectMapper.readValue(path.toFile(), Information.class);
 
     }
 
 }
 
+
+@Slf4j
 public class WiseSayingApp {
     private List<Information> wiseSayings = new ArrayList<>();
     private int id = 0;
@@ -79,6 +90,8 @@ public class WiseSayingApp {
                 delete(input, scanner);
             } else if (input.startsWith("수정?id=")) {
                 update(input, scanner);
+            } else if (input.equals("빌드")) {
+                build();
             }
 
         }
@@ -122,6 +135,33 @@ public class WiseSayingApp {
         }
     }
 
+    // 삭제/파일삭제
+    private void delete(String input, Scanner scanner) {
+
+        int deleteNum = Integer.parseInt(input.split("=") [1] );
+
+        try {
+            if (deleteNum > wiseSayings.size() || deleteNum <= 0) {
+                throw new IllegalArgumentException(deleteNum + "번 명언은 존재하지 않습니다.");
+            } else if (wiseSayings.get(deleteNum-1) == null){
+                throw new IllegalArgumentException(deleteNum + "번 명언은 존재하지 않습니다.");
+            } else {
+                wiseSayings.set(deleteNum -1, null);
+                try {
+                    Files.deleteIfExists(Paths.get("db/wiseSaying/" + deleteNum + ".json"));
+                    System.out.println(deleteNum + "번 명언이 삭제 되었습니다.");
+                } catch (IOException e) {
+                    System.out.println("파일 삭제 중 오류가 발생 했습니다.");
+                }
+
+
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
     // 수정
     private void update(String input, Scanner scanner ) {
 
@@ -158,29 +198,17 @@ public class WiseSayingApp {
         }
     }
 
-    // 삭제/파일삭제
-    private void delete(String input, Scanner scanner) {
-
-        int deleteNum = Integer.parseInt(input.split("=") [1] );
+    // 모두 등록
+    private void build() {
 
         try {
-            if (deleteNum > wiseSayings.size() || deleteNum <= 0) {
-                throw new IllegalArgumentException(deleteNum + "번 명언은 존재하지 않습니다.");
-            } else if (wiseSayings.get(deleteNum-1) == null){
-                throw new IllegalArgumentException(deleteNum + "번 명언은 존재하지 않습니다.");
-            } else {
-                wiseSayings.set(deleteNum -1, null);
-                try {
-                    Files.deleteIfExists(Paths.get("db/wiseSaying/" + id + ".json"));
-                    System.out.println(deleteNum + "번 명언이 삭제 되었습니다.");
-                } catch (IOException e) {
-                    System.out.println("파일 삭제 중 오류가 발생 했습니다.");
-                }
-
-
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+            String jsonContent = objectMapper.writeValueAsString(wiseSayings);
+            Files.writeString(Paths.get("db/wiseSaying/data.json"), jsonContent);
+        } catch (IOException e) {
+            log.error("전체 파일 저장 중 오류가 발생했습니다.");
+        } finally {
+            log.info("data.json 파일의 내용이 갱신되었습니다.");
         }
 
     }
@@ -203,7 +231,7 @@ public class WiseSayingApp {
                 Information info = Information.loadFromFile(i);
                 wiseSayings.add(info);
             } catch (IOException e) {
-                System.out.println(i + "번 명언을 불러오는 중 오류가 발생했습니다.");
+                log.error(i + "번 명언을 불러오는 중 오류가 발생했습니다.", e);
             }
         }
 
