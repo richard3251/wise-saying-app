@@ -33,6 +33,8 @@ public class App {
                 wiseSayingController.actionDelete(input);
             } else if (input.startsWith("수정?id=")) {
                 wiseSayingController.actionModify(input);
+            } else if (input.equals("빌드")) {
+                wiseSayingController.actionBuild();
             }
         }
 

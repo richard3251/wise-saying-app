@@ -38,6 +38,10 @@ public class WiseSayingService {
         wiseSayingRepository.modify(wiseSaying);
     }
 
+    public void build() {
+        wiseSayingRepository.build();
+    }
+
 
 
 }

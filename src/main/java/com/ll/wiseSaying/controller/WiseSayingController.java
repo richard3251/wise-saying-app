@@ -49,9 +49,6 @@ public class WiseSayingController {
         } else {
             System.out.println(id + "번 명언은 존재하지 않습니다.");
         }
-
-
-
     }
 
     public void actionModify(String input) {
@@ -75,22 +72,11 @@ public class WiseSayingController {
         } catch (IndexOutOfBoundsException | NullPointerException e) {
             System.out.println(id + "번 명언은 존재하지 않습니다.");
         }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void actionBuild() {
+        wiseSayingService.build();
+        System.out.println("data.json 파일의 내용이 갱신되었습니다.");
     }
 
 
