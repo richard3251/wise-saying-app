@@ -31,21 +31,20 @@ class Information {
         this.author = author;
     }
 
+
+
     // 객체에서 JSON 파일로 저장
     public void saveToFile() throws IOException {
 
         Path directoryPath = Paths.get("db/wiseSaying");
         if (Files.notExists(directoryPath)) {
-            Files.createDirectories(directoryPath);
+        Files.createDirectories(directoryPath);
         }
 
-//        Gson gson = new GsonBuilder().setPrettyPrinting().create(); // Gson
-        ObjectMapper objectMapper = new ObjectMapper(); // Jackson
+        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // .json파일 이쁘게 저장.
 
-//        String jsonContent = gson.toJson(this); // Gson
-        String jsonContent = objectMapper.writeValueAsString(this); // Jackson
-
+        String jsonContent = objectMapper.writeValueAsString(this);
         Files.writeString(Paths.get("db/wiseSaying/" + id + ".json"), jsonContent);
 
     }
